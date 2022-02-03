@@ -1,0 +1,85 @@
+global:
+  datacenter: "${dcName}"
+  name: consul
+  domain: consul
+  image: hashicorp/consul-enterprise:1.11.1-ent
+  enterpriseLicense:
+    secretName: consul-ent-license
+    secretKey: key
+  adminPartitions:
+    enabled: true
+  metrics:
+    enabled: true
+    enableAgentMetrics: true
+    enableGatewayMetrics: true
+  tls:
+    enabled: true
+    httpsOnly: false
+  federation:
+    enabled: false
+  acls:
+    manageSystemACLs: true
+    createReplicationToken: true
+  gossipEncryption:
+    secretName: consul-gossip-encryption-key
+    secretKey: key
+  enableConsulNamespaces: true
+server:
+  exposeGossipAndRPCPorts: true
+client:
+  extraConfig: |
+    {
+      "audit": {
+          "enabled": true,
+          "sink": {
+              "My sink": {
+                  "type": "file",
+                  "format": "json",
+                  "path": "/consul/data/audit.json",
+                  "delivery_guarantee": "best-effort",
+                  "rotate_duration": "24h",
+                  "rotate_max_files": 1,
+                  "rotate_bytes": 25165824
+              }
+          }
+      }
+    }
+connectInject:
+  enabled: true
+  transparentProxy:
+    defaultEnabled: true
+  # envoyExtraArgs: "--log-level debug"
+  consulNamespaces:
+    mirroringK8S: true
+  metrics:
+    defaultEnabled: true
+    defaultEnableMerging: true
+    defaultPrometheusScrapePort: 20200
+    defaultPrometheusScrapePath: "/metrics"
+prometheus:
+  enabled: true
+controller:
+  enabled: true
+meshGateway:
+  enabled: true
+  replicas: 2
+ingressGateways:
+  enabled: true
+  gateways:
+    - name: ingress-gateway
+      service:
+        type: LoadBalancer
+terminatingGateways:
+  enabled: true
+ui:
+  service:
+    type: LoadBalancer
+  metrics:
+    enabled: true
+    provider: "prometheus"
+    baseURL: http://prometheus-server
+syncCatalog:
+  enabled: true
+  consulNamespaces:
+    mirroringK8S: true
+  k8sDenyNamespaces: ["kube-system", "kube-public"]

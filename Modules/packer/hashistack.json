@@ -1,0 +1,56 @@
+{
+  "builders": [
+    {
+      "name": "amazon-ebs-ubuntu-bionic",
+      "type": "amazon-ebs",
+      "region": "eu-west-3",
+      "spot_price": "0",
+      "force_deregister": true,
+      "force_delete_snapshot": true,
+      "ssh_pty": true,
+      "instance_type": "m5.large",
+      "associate_public_ip_address": true,
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "099720109477"
+        ],
+        "most_recent": true
+      },
+      "ssh_username": "ubuntu",
+      "ssh_timeout": "10m",
+      "ami_virtualization_type": "hvm",
+      "ami_name": "hashistack-{{isotime \"2006-01-02\"}}",
+      "ami_description": "Hashistack - Ubuntu",
+      "ami_regions": [
+        "eu-west-3"
+      ],
+      "tags": {
+        "Name": "Hashistack",
+        "OS": "ubuntu",
+        "OS-Version": "bionic"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/home/ubuntu",
+      "source": "Files/license",
+      "type": "file"
+    },
+    {
+      "destination": "/home/ubuntu",
+      "source": "Files/policies",
+      "type": "file"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/aws.sh",
+      "only": ["amazon-ebs-ubuntu-bionic"]
+    }
+  ]
+}

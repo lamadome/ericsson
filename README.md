@@ -13,3 +13,4 @@ This terraform code will create:
 3. Open the terraform.tfvars file and make sure to verify the value
 4. Have a look at the main.tf file
 5. Run ``terraform plan``
+6. Run ``terraform apply``
